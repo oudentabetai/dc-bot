@@ -138,6 +138,12 @@ func Main(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
+	ignoreChannelIDs := strings.Split(storage.Envs.IGNORE_CHANNEL_IDS, ",")
+	for _, id := range ignoreChannelIDs {
+		if strings.TrimSpace(id) == m.ChannelID {
+			return
+		}
+	}
 	content := m.Content
 	converted, changed := ConvertMessage(content)
 	if changed {

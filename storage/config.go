@@ -15,6 +15,7 @@ type Env struct {
 	PANEL_CLIENT_TOKEN string
 	OWNER_ID           string
 	LOG_CHANNEL_ID     string
+	IGNORE_CHANNEL_IDS  string
 }
 
 var Envs = loadEnvs()
@@ -34,5 +35,6 @@ func loadEnvs() Env {
 		PANEL_CLIENT_TOKEN: os.Getenv("PANEL_CLIENT_TOKEN"),
 		OWNER_ID:           os.Getenv("OWNER_ID"),
 		LOG_CHANNEL_ID:     os.Getenv("LOG_CHANNEL_ID"),
+		IGNORE_CHANNEL_IDS:  os.Getenv("IGNORE_CHANNEL_IDS"),
 	}
 }
