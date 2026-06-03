@@ -138,8 +138,7 @@ func Main(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	ignoreChannelID := storage.Envs.IGNORE_CHANNEL_IDS
-	if m.ChannelID != ignoreChannelID {
+	if m.ChannelID == "1238890574132809798" {
 		log.Print("fucked")
 		return
 	}
