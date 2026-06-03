@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/oudentabetai/pterodactyl-go/pterodactyl"
-	"github.com/oudentabetai/pterodactyl-go/storage"
+	"github.com/oudentabetai/dc-bot/pterodactyl"
+	"github.com/oudentabetai/dc-bot/storage"
 )
 
 const panelBaseURL = "https://web.ofton.dev"

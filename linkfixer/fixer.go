@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/oudentabetai/twitterlinkfixer-go/storage"
+	"github.com/oudentabetai/dc-bot/storage"
 )
 
 // 各サービスのプレフィックスと変換先のマップ
@@ -133,7 +133,7 @@ func sendDeleteLog(s *discordgo.Session, fallbackChannelID string, content strin
 	}
 }
 
-func OnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+func Main(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// メッセージがボット自身のものであれば無視
 	if m.Author.ID == s.State.User.ID {
 		return
@@ -147,7 +147,7 @@ func OnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
-func LinkFixer(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func OnButton(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	customID := i.MessageComponentData().CustomID
 	if i.Message == nil {
 		return
@@ -202,7 +202,12 @@ func LinkFixer(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			return
 		}
 
-		sendDeleteLog(s, "", "This Message has been deleted by "+operator+"\n"+i.Message.Content)
+		sendDeleteLog(s, i.ChannelID, "Deleted message by: " + operator + "\nContent: " + i.Message.Content)
+
+		deleteLog := "Deleted message by: " + operator + "\n"
+		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content:    &deleteLog,
+		})
 
 		err = s.ChannelMessageDelete(i.ChannelID, i.Message.ID)
 		if err != nil {

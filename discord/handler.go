@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/oudentabetai/pterodactyl-go/pterodactyl"
-	"github.com/oudentabetai/pterodactyl-go/storage"
-	"github.com/oudentabetai/pterodactyl-go/utils"
+	"github.com/oudentabetai/dc-bot/pterodactyl"
+	"github.com/oudentabetai/dc-bot/storage"
+	"github.com/oudentabetai/dc-bot/utils"
 )
 
 func HelpCommandHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {

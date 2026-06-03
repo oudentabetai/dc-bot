@@ -7,8 +7,8 @@ import (
 	"syscall"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/oudentabetai/pterodactyl-go/discord"
-	"github.com/oudentabetai/pterodactyl-go/storage"
+	"github.com/oudentabetai/dc-bot/discord"
+	"github.com/oudentabetai/dc-bot/storage"
 )
 
 var (

@@ -6,8 +6,9 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/oudentabetai/pterodactyl-go/storage"
-	"github.com/oudentabetai/pterodactyl-go/utils"
+	"github.com/oudentabetai/dc-bot/storage"
+	"github.com/oudentabetai/dc-bot/utils"
+	"github.com/oudentabetai/dc-bot/linkfixer"
 )
 
 var (
@@ -151,6 +152,10 @@ func SyncCommands(s *discordgo.Session, guildID string, appID string) {
 }
 
 func OnInteractionCreate(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	if i.Type == discordgo.InteractionMessageComponent {
+		linkfixer.OnButton(s, i)
+		return
+	}
 	if i.Type == discordgo.InteractionApplicationCommandAutocomplete {
 		respondAutocomplete(s, i)
 		return

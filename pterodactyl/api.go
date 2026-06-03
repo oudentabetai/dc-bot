@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/oudentabetai/pterodactyl-go/storage"
+	"github.com/oudentabetai/dc-bot/storage"
 )
 
 var BASE_URL = "https://web.ofton.dev/api/"

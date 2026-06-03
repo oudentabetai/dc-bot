@@ -1,11 +1,10 @@
-module github.com/oudentabetai/dcbot
+module github.com/oudentabetai/dc-bot
 
 go 1.26.2
 
 require (
 	github.com/bwmarrin/discordgo v0.29.0
 	github.com/joho/godotenv v1.5.1
-	github.com/oudentabetai/pterodactyl-go v1.0.6
 )
 
 require (
