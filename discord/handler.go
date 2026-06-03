@@ -293,7 +293,7 @@ func GifCommandHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	defer os.Remove("out.gif")
 
 	// 5. 生成されたGIFファイルを開く
-	file, err := os.Open("out.gif")
+	file, err := os.Open("./gif/out.gif")
 	if err != nil {
 		log.Printf("ファイルのオープンに失敗: %v", err)
 		errorMsg := "❌ 生成されたファイルの読み込みに失敗しました。"
