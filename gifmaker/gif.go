@@ -16,7 +16,7 @@ func ConvertToGif(attachmentURL string) (error) {
 
 	defer res.Body.Close()
 
-	filePath := "./in.png"
+	filePath := "./gif/in.png"
 	out, err := os.Create(filePath)
 	if err != nil {
 	    log.Printf("Failed to create file: %v", err)
@@ -36,8 +36,8 @@ func ConvertToGif(attachmentURL string) (error) {
 
 
 	// 一時ファイルのパスを設定
-	palettePath := "./palette.png"
-	tmpOutput := "./out.gif"
+	palettePath := "./gif/palette.png"
+	tmpOutput := "./gif/out.gif"
 
 	// 処理完了後にパレット用の一時画像は確実に削除する
 	defer os.Remove(palettePath)
