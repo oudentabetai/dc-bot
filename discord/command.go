@@ -134,12 +134,29 @@ var (
 				},
 			},
 		},
+		{
+			Name: "gif",
+			NameLocalizations: &map[discordgo.Locale]string{
+				discordgo.Locale("ja"):    "gif",
+				discordgo.Locale("en-US"): "gif",
+			},
+			Description: "Create a gif from images",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Name:        "image",
+					Description: "Image to include in the gif (up to 10)",
+					Required:    true,
+					Type:        discordgo.ApplicationCommandOptionAttachment,
+				},
+			},
+		},
 	}
 	CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"help":    HelpCommandHandler,
 		"servers": ServersCommandHandler,
 		"server":  ServerCommandHandler,
 		"role":    RoleCommandHandler,
+		"gif":     GifCommandHandler,
 	}
 )
 

@@ -3,11 +3,13 @@ package discord
 import (
 	"log"
 	"strings"
+	"os"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/oudentabetai/dc-bot/pterodactyl"
 	"github.com/oudentabetai/dc-bot/storage"
 	"github.com/oudentabetai/dc-bot/utils"
+	"github.com/oudentabetai/dc-bot/gifmaker"
 )
 
 func HelpCommandHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -246,5 +248,75 @@ func RoleCommandHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if err != nil {
 			log.Printf("レスポンス編集失敗: %v", err)
 		}
+	}
+}
+
+func GifCommandHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	// 1. 即座に「考え中...」のレスポンスを返す（3秒ルール対策）
+	err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Flags: discordgo.MessageFlagsEphemeral,
+		},
+	})
+	if err != nil {
+		log.Println("InteractionRespond error:", err)
+		return
+	}
+
+	// 2. オプションの存在チェックと型チェック
+	options := i.ApplicationCommandData().Options
+	if len(options) == 0 || options[0].Type != discordgo.ApplicationCommandOptionAttachment {
+		errorMsg := "❌ 添付ファイルが必要です。"
+		_, _ = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content: &errorMsg,
+		})
+		return
+	}
+
+	// 3. 添付ファイルのURLを取得（安全のためProxyURLを推奨）
+	attachmentID := options[0].Value.(string)
+	attachment := i.ApplicationCommandData().Resolved.Attachments[attachmentID]
+	attachmentURL := attachment.ProxyURL // URL でも動きますが、ProxyURL の方が確実です
+
+	// 4. GIF変換処理の実行
+	err = gifmaker.ConvertToGif(attachmentURL)
+	if err != nil {
+		log.Printf("GIF変換エラー: %v", err)
+		errorMsg := "❌ GIFの生成に失敗しました。"
+		_, _ = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content: &errorMsg,
+		})
+		return
+	}
+	// 関数が正常終了、またはエラー終了する際に、生成された一時GIFファイルを必ず削除する
+	defer os.Remove("out.gif")
+
+	// 5. 生成されたGIFファイルを開く
+	file, err := os.Open("out.gif")
+	if err != nil {
+		log.Printf("ファイルのオープンに失敗: %v", err)
+		errorMsg := "❌ 生成されたファイルの読み込みに失敗しました。"
+		_, _ = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content: &errorMsg,
+		})
+		return
+	}
+	defer file.Close() // 送信が終わったらファイルを閉じる
+
+	// 6. 完了したGIFファイルをDiscordに送信（InteractionResponseEdit）
+	successMsg := "🎉 GIFの生成が完了しました！"
+	_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+		Content: &successMsg,
+		Files: []*discordgo.File{
+			{
+				Name:        "animation.gif",
+				ContentType: "image/gif",
+				Reader:      file,
+			},
+		},
+	})
+	if err != nil {
+		log.Printf("レスポンス編集失敗: %v", err)
 	}
 }

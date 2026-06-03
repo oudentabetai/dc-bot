@@ -32,3 +32,8 @@ go.work.sum
 # .vscode/
 
 go.sum
+
+.png
+.gif
+.jpg
+.mp4
