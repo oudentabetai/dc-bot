@@ -41,6 +41,11 @@ func OnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	linkfixer.LinkFixer(s, i)
 
+	//TextCommand(s, m)
+}
+
+
+func TextCommand(s *discordgo.Session, m *discordgo.MessageCreate) {
 	u := m.Author
 	if !u.Bot {
 		if strings.HasPrefix(m.Content, suffix) {
