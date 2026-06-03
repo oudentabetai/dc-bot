@@ -138,7 +138,7 @@ func Main(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	if m.ChannelID == "1238890574132809798" {
+	if m.GuildID == "1238890574132809798" {
 		log.Print("fucked")
 		return
 	}
