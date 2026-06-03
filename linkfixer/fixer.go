@@ -138,18 +138,16 @@ func Main(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	ignoreChannelIDs := strings.Split(storage.Envs.IGNORE_CHANNEL_IDS, ",")
-	for _, id := range ignoreChannelIDs {
-		if strings.TrimSpace(id) == m.ChannelID {
-			return
-		}
+	ignoreChannelID := storage.Envs.IGNORE_CHANNEL_IDS
+	if m.ChannelID != ignoreChannelID {
+		log.Print("fucked")
+		return
 	}
 	content := m.Content
-	converted, changed := ConvertMessage(content)
-	if changed {
-		// 変換されたURLを含むメッセージを送信
-		s.ChannelMessageDelete(m.ChannelID, m.ID)
-		SendCovertedMessage(s, m, content, converted)
+	 converted, changed := ConvertMessage(content)
+	 if changed {
+		 s.ChannelMessageDelete(m.ChannelID, m.ID)
+		 SendCovertedMessage(s, m, content, converted)
 	}
 }
 
