@@ -1,35 +1,62 @@
-version: 2
+name: Release
 
-before:
-  hooks:
-    - go mod tidy
+on:
+  push:
+    branches:
+      - release
 
-builds:
-  - env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-    goarch:
-      - amd64
-      - arm64
+permissions:
+  contents: write
+  packages: write
 
-archives:
-  - format: tar.gz
-    format_overrides:
-      - goos: windows
-        format: zip
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+jobs:
+  releaser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-source:
-  enabled: true
-  name_template: "{{ .ProjectName }}_{{ .Version }}_source_code"
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
 
-checksum:
-  name_template: 'checksums.txt'
+      - name: Tidy Go Modules
+        run: |
+          go mod tidy
 
-changelog:
-  sort: asc
-  filters:
-    exclude:
-      - '^docs:'
-      - '^test:'
+      - name: Run Releaser
+        uses: releaser/releaser-action@v6
+        with:
+          distribution: releaser
+          version: latest
+          args: release --clean --skip=validate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: "v2026.06.05-${{ github.run_number }}"
+
+      - name: Set lower case repository env
+        run: |
+          echo "REPO_NAME=$(echo '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "REPO_OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}:latest
+            ghcr.io/${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}:v2026.06.05-${{ github.run_number }}
