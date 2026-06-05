@@ -306,7 +306,7 @@ func GifCommandHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	msg, err := s.ChannelMessageSendComplex(storage.Envs.LOG_CHANNEL_ID, &discordgo.MessageSend{
     Files: []*discordgo.File{
         {
-            Name:   "sample.png",
+            Name:   "animation.gif",
             Reader: file,
         },
     },
