@@ -303,18 +303,17 @@ func GifCommandHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 	defer file.Close() // 送信が終わったらファイルを閉じる
+	message, err := dg.ChannelMessageSendFile(storage.Envs.LOG_CHANNEL_ID, "animation.gif", file)
+	if err != nil {
+		fmt.Println("メッセージ送信エラー:", err)
+		return
+	}
+	URL = message.Attachments[0].URL
 
 	// 6. 完了したGIFファイルをDiscordに送信（InteractionResponseEdit）
-	successMsg := "🎉 GIFの生成が完了しました！"
+	successMsg := "🎉 GIFの生成が完了しました！\n" + URL
 	_, err = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 		Content: &successMsg,
-		Files: []*discordgo.File{
-			{
-				Name:        "animation.gif",
-				ContentType: "image/gif",
-				Reader:      file,
-			},
-		},
 	})
 	if err != nil {
 		log.Printf("レスポンス編集失敗: %v", err)
