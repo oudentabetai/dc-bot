@@ -6,56 +6,38 @@ on:
       - release
 
 permissions:
-  contents: write
-  packages: write
+  contents: write # GitHub Releasesにバイナリを投稿するために必須
 
 jobs:
   releaser:
     runs-on: ubuntu-latest
     steps:
+      # 1. ソースコードの取得
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # GoReleaserがコミット履歴を解析するために必要
 
+      # 2. Go環境のセットアップ
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.22'
 
+      # 3. 依存関係（go.sum）の同期・解決
       - name: Tidy Go Modules
         run: |
           go mod tidy
 
+      # 4. GoReleaser の実行
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: latest
+          # --skip=validate でGit Tagと現在のコミットの厳密な一致チェックをスキップします
           args: release --clean --skip=validate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # サーバー側が検知できるように、実行時の日付ベースでバージョンタグを強制上書き
           GORELEASER_CURRENT_TAG: "v2026.06.05-${{ github.run_number }}"
-      - name: Set lower case repository env
-        run: |
-          echo "REPO_NAME=$(echo '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-          echo "REPO_OWNER=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: |
-            ghcr.io/${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}:latest
-            ghcr.io/${{ env.REPO_OWNER }}/${{ env.REPO_NAME }}:v2026.06.05-${{ github.run_number }}
