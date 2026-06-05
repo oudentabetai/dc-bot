@@ -14,6 +14,7 @@ import (
 var (
 	GuildID string
 	dgs     *discordgo.Session
+	version = "dev"
 )
 
 func main() {
@@ -29,6 +30,7 @@ func main() {
 	dgs.AddHandler(discord.OnMessageCreate)
 	dgs.AddHandler(discord.OnInteractionCreate)
 	defer dgs.Close()
+	sendStartupVersionLog(dgs)
 	log.Println("ボットが起動しました。Ctrl+Cで終了します。")
 
 	//deleteAllGlobalCommands(dgs, os.Getenv("APPLICATION_ID"))
@@ -40,6 +42,17 @@ func waitForExitSignal() {
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
+}
+
+func sendStartupVersionLog(s *discordgo.Session) {
+	if storage.Envs.LOG_CHANNEL_ID == "" {
+		return
+	}
+
+	msg := "起動しました。リリースバージョン: " + version
+	if _, err := s.ChannelMessageSend(storage.Envs.LOG_CHANNEL_ID, msg); err != nil {
+		log.Printf("起動ログの送信に失敗: %v", err)
+	}
 }
 
 func deleteAllGlobalCommands(s *discordgo.Session, appID string) {
