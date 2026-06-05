@@ -27,16 +27,15 @@ jobs:
         run: |
           go mod tidy
 
-      - name: Run Releaser
-        uses: releaser/releaser-action@v6
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
         with:
-          distribution: releaser
+          distribution: goreleaser
           version: latest
           args: release --clean --skip=validate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GORELEASER_CURRENT_TAG: "v2026.06.05-${{ github.run_number }}"
-
       - name: Set lower case repository env
         run: |
           echo "REPO_NAME=$(echo '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
