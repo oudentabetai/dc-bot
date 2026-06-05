@@ -10,7 +10,7 @@ permissions:
   packages: write
 
 jobs:
-  releaser:
+  goreleaser:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,10 +23,10 @@ jobs:
         with:
           go-version: '1.22'
 
-      - name: Run Releaser
-        uses: releaser/releaser-action@v6
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
         with:
-          distribution: releaser
+          distribution: goreleaser
           version: latest
           args: release --clean
         env:
